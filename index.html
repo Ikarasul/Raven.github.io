@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - RavenPort</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="js/auth-check.js"></script>
+    <link rel="stylesheet" href="css/login.css">
+</head>
+
+<body>
+
+    <div class="login-card animate-enter">
+        <div class="brand-icon">
+            <i data-lucide="sprout" width="40" height="40"></i>
+        </div>
+
+        <h1 class="text-2xl font-extrabold text-slate-800 mb-2" data-i18n="login_title">Hello Again! 👋</h1>
+        <p class="text-slate-500 mb-8 font-medium" data-i18n="login_subtitle">Welcome to your cute workspace.</p>
+
+        <form id="login-form" class="space-y-4 text-left">
+            <div>
+                <label class="block text-xs font-bold text-slate-400 uppercase ml-1 mb-1.5"
+                    data-i18n="login_user_ph">Username</label>
+                <div class="relative">
+                    <input type="text" id="username" class="cute-input" placeholder="Enter username..." icon="user"
+                        data-i18n-ph="login_user_ph">
+                    <i data-lucide="user" class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 w-5 h-5"></i>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-400 uppercase ml-1 mb-1.5"
+                    data-i18n="login_pass_ph">Password</label>
+                <div class="relative">
+                    <input type="password" id="password" class="cute-input" placeholder="••••••••">
+                    <button type="button" class="password-toggle">
+                        <i data-lucide="eye" width="20"></i>
+                    </button>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-login flex items-center justify-center gap-2">
+                <span data-i18n="login_btn">Sign In</span> <i data-lucide="arrow-right" width="20"></i>
+            </button>
+        </form>
+
+        <div class="my-6 flex items-center gap-4">
+            <div class="h-px bg-slate-100 flex-1"></div>
+            <span class="text-xs text-slate-400 font-bold uppercase">Or Visit As</span>
+            <div class="h-px bg-slate-100 flex-1"></div>
+        </div>
+
+        <button class="btn-guest flex items-center justify-center gap-2">
+            <i data-lucide="ghost" width="18"></i> <span data-i18n="login_guest">Guest Visitor</span>
+        </button>
+
+        <p id="error-msg" class="mt-4 text-rose-500 text-sm font-bold hidden bg-rose-50 p-2 rounded-lg shake"
+            data-i18n="login_fail">
+            Incorrect username or password!
+        </p>
+    </div>
+
+    <script src="js/login.js"></script>
+</body>
+
+</html>
