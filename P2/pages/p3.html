@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="RavenPort - ระบบจัดการการเงินส่วนตัว">
+    <meta name="theme-color" content="#10b981">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>Wallet - Raven.Space</title>
+
+    <!-- Performance: Preconnect to CDNs -->
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    <link rel="preconnect" href="https://unpkg.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="../js/auth-check.js"></script>
+    <script src="../js/theme.js"></script>
+    <script src="../js/nav.js"></script>
+    <!-- 🎄 Christmas Theme (Optional) -->
+    <link rel="stylesheet" href="../css/christmas-theme.css">
+    <script src="../js/christmas-effects.js" defer></script>
+    <script src="../js/finance.js"></script>
+
+    <style>
+        body {
+            background-color: #f1f5f9;
+            font-family: 'Outfit', sans-serif;
+            color: #334155;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ANIMATED BACKGROUND */
+        .aurora-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background:
+                radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(59, 130, 246, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(244, 63, 94, 0.15) 0px, transparent 50%);
+            background-size: 200% 200%;
+            animation: aurora 20s infinite ease-in-out;
+        }
+
+        @keyframes aurora {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* Glass Cards */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        .main-balance-card {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border-radius: 2rem;
+            padding: 2.5rem;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 40px -10px rgba(16, 185, 129, 0.4);
+        }
+
+        .main-balance-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.2), transparent 70%);
+            animation: pulse 4s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 0.5;
+                transform: scale(0.9);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1.1);
+            }
+
+            100% {
+                opacity: 0.5;
+                transform: scale(0.9);
+            }
+        }
+
+        /* Inputs */
+        .lumi-input {
+            background: rgba(255, 255, 255, 0.5);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            border-radius: 1rem;
+            padding: 1rem;
+            width: 100%;
+            transition: all 0.2s;
+            outline: none;
+            font-size: 1rem;
+        }
+
+        .lumi-input:focus {
+            background: white;
+            border-color: #10b981;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+
+        /* List Item */
+        .tx-item {
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 1rem;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .tx-item:hover {
+            background: white;
+            transform: scale(1.01);
+            border-color: rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+        }
+
+        .scroll-hide::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+</head>
+
+<body class="selection:bg-emerald-200 selection:text-emerald-900">
+
+    <div class="aurora-bg"></div>
+
+    <!-- Container -->
+    <div class="max-w-4xl mx-auto px-6 pt-24 pb-20 animate-enter">
+
+        <!-- HEADER -->
+        <div class="flex items-end justify-between mb-8">
+            <div>
+                <h1 class="text-3xl font-black text-slate-800 tracking-tight" data-i18n="p3_title">จัดการการเงิน 💸</h1>
+                <p class="text-slate-500 font-medium" data-i18n="p3_subtitle">ติดตามรายรับ-รายจ่ายของคุณ</p>
+            </div>
+            <button onclick="clearData()"
+                class="text-xs font-bold text-slate-400 hover:text-rose-500 bg-white/50 hover:bg-white px-4 py-2 rounded-full border border-slate-200 transition-all">
+                Reset Data
+            </button>
+        </div>
+
+        <div class="grid lg:grid-cols-12 gap-8">
+
+            <!-- LEFT COLUMN (Balance + Add) -->
+            <div class="lg:col-span-5 space-y-6">
+
+                <!-- Main Card -->
+                <div class="main-balance-card">
+                    <div class="relative z-10">
+                        <div class="text-emerald-100 font-bold uppercase text-xs tracking-wider mb-1"
+                            data-i18n="p3_bal">ยอดคงเหลือ</div>
+                        <div class="text-5xl font-black tracking-tight mb-8">฿<span id="balance">0.00</span></div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="bg-black/10 backdrop-blur rounded-2xl p-3">
+                                <div
+                                    class="flex items-center gap-2 text-emerald-100 text-[10px] font-bold uppercase mb-1">
+                                    <i data-lucide="arrow-down-circle" width="12"></i> <span
+                                        data-i18n="p3_in">รายรับ</span>
+                                </div>
+                                <div class="font-bold text-xl" id="total-income">0</div>
+                            </div>
+                            <div class="bg-black/10 backdrop-blur rounded-2xl p-3">
+                                <div class="flex items-center gap-2 text-rose-100 text-[10px] font-bold uppercase mb-1">
+                                    <i data-lucide="arrow-up-circle" width="12"></i> <span
+                                        data-i18n="p3_ex">รายจ่าย</span>
+                                </div>
+                                <div class="font-bold text-xl" id="total-expense">0</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Add Form -->
+                <div class="glass-card p-6">
+                    <h3 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span> <span
+                            data-i18n="p3_add">เพิ่มรายการ</span>
+                    </h3>
+                    <form id="transaction-form" class="space-y-4">
+                        <div>
+                            <input type="text" id="text" class="lumi-input" placeholder="รายการ..." required
+                                data-i18n-ph="p3_desc_ph">
+                        </div>
+                        <div>
+                            <input type="number" id="amount" class="lumi-input" placeholder="จำนวนเงิน..." step="0.01"
+                                required data-i18n-ph="p3_amt_ph">
+                        </div>
+                        <div class="grid grid-cols-2 gap-3 pt-2">
+                            <button type="button" onclick="addTransaction(true)"
+                                class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 rounded-xl shadow-lg shadow-emerald-500/20 transition-all flex items-center justify-center gap-2">
+                                <i data-lucide="plus" width="18"></i> <span data-i18n="p3_in">รายรับ</span>
+                            </button>
+                            <button type="button" onclick="addTransaction(false)"
+                                class="bg-rose-500 hover:bg-rose-600 text-white font-bold py-3 rounded-xl shadow-lg shadow-rose-500/20 transition-all flex items-center justify-center gap-2">
+                                <i data-lucide="minus" width="18"></i> <span data-i18n="p3_ex">รายจ่าย</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN (History) -->
+            <div class="lg:col-span-7">
+                <div class="glass-card h-full p-6 flex flex-col">
+                    <h3 class="font-bold text-slate-800 mb-6 flex items-center justify-between">
+                        <span class="flex items-center gap-2" data-i18n="p3_hist">ประวัติทำรายการ</span>
+                    </h3>
+
+                    <div id="list" class="flex-1 overflow-y-auto pr-2 scroll-hide max-h-[500px]">
+                        <!-- JS Rendered -->
+                    </div>
+
+                    <div id="empty-state"
+                        class="hidden h-full flex flex-col items-center justify-center text-slate-400 opacity-60 min-h-[200px]">
+                        <i data-lucide="wallet" width="48" stroke-width="1.5"></i>
+                        <p class="mt-4 font-medium">No transactions yet.</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Chatbot attached -->
+    <div id="chatbot-container"></div>
+    <script src="../js/chatbot.js"></script>
+
+    <script>
+        // Init
+        // Adapter for UI
+        const balanceEl = document.getElementById('balance');
+        const incomeEl = document.getElementById('total-income');
+        const expenseEl = document.getElementById('total-expense');
+        const listEl = document.getElementById('list');
+        const textInput = document.getElementById('text');
+        const amountInput = document.getElementById('amount');
+        const emptyState = document.getElementById('empty-state');
+
+        function renderUI() {
+            // Get data from centralized system
+            const transactions = window.RavenFinance.data;
+            const summary = window.RavenFinance.getSummary();
+
+            // Update Header
+            balanceEl.innerText = summary.formatted.total;
+            incomeEl.innerText = '+' + summary.formatted.income;
+            expenseEl.innerText = '-' + summary.formatted.expense;
+
+            // Update List
+            listEl.innerHTML = '';
+            if (transactions.length === 0) {
+                emptyState.classList.remove('hidden');
+            } else {
+                emptyState.classList.add('hidden');
+                // Clone and reverse for display (newest first)
+                [...transactions].reverse().forEach(t => addTransactionDOM(t));
+            }
+            lucide.createIcons();
+        }
+
+        function addTransaction(isIncome) {
+            if (textInput.value.trim() === '' || amountInput.value.trim() === '') {
+                alert('Please add a text and amount');
+                return;
+            }
+
+            window.RavenFinance.addTransaction(
+                textInput.value,
+                amountInput.value,
+                isIncome
+            );
+
+            textInput.value = '';
+            amountInput.value = '';
+            // UI updates automatically via listener
+        }
+
+        function addTransactionDOM(transaction) {
+            const isIncome = transaction.amount > 0;
+            const sign = isIncome ? '+' : '-';
+
+            const item = document.createElement('div');
+            item.classList.add('tx-item', 'animate-enter');
+            item.innerHTML = `
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-full ${isIncome ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-600'} flex items-center justify-center flex-shrink-0">
+                        <i data-lucide="${isIncome ? 'arrow-down-left' : 'arrow-up-right'}" width="20"></i>
+                    </div>
+                    <div>
+                        <div class="font-bold text-slate-700">${transaction.text}</div>
+                        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wide">${transaction.date}</div>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <div class="font-bold ${isIncome ? 'text-emerald-600' : 'text-slate-700'} text-lg">
+                        ${sign}${numberWithCommas(Math.abs(transaction.amount))}
+                    </div>
+                    <button onclick="removeTransaction(${transaction.id})" class="text-[10px] text-slate-300 hover:text-rose-500 font-bold uppercase transition-colors">Delete</button>
+                </div>
+            `;
+            listEl.appendChild(item);
+        }
+
+        function removeTransaction(id) {
+            if (confirm('Delete this transaction?')) {
+                window.RavenFinance.removeTransaction(id);
+            }
+        }
+
+        function clearData() {
+            if (confirm('Are you sure you want to reset all data?')) {
+                window.RavenFinance.clearData();
+            }
+        }
+
+        function numberWithCommas(x) {
+            return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderUI();
+
+            // Auto Update from centralized system
+            window.addEventListener('raven-finance-update', renderUI);
+        });
+    </script>
+</body>
+
+</html>

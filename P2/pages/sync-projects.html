@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sync Projects - RavenPort</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Prompt:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- 🎄 Christmas Theme -->
+    <link rel="stylesheet" href="../css/christmas-theme.css">
+    <script src="../js/christmas-effects.js" defer></script>
+</head>
+
+<body class="bg-slate-50 p-8 christmas-mode">
+    <div class="aurora-bg"></div>
+    <div class="max-w-2xl mx-auto relative z-10">
+        <div class="glass-card p-8 shadow-lg"> <!-- Changed to glass-card for theme support -->
+            <h1 class="text-3xl font-black text-slate-900 mb-4 flex items-center gap-3">
+                <span>🔄</span> <span data-i18n="sync_title">Project Data Sync</span>
+            </h1>
+            <p class="text-slate-600 mb-8 font-medium">
+                ใช้หน้านี้เพื่อ sync ข้อมูลผลงานระหว่าง localhost และ ngrok
+            </p>
+
+            <div class="space-y-6">
+                <!-- Current Projects -->
+                <div class="p-6 bg-white/60 border border-blue-200 rounded-2xl shadow-sm">
+                    <h2 class="font-bold text-blue-900 mb-3 flex items-center gap-2">
+                        <i data-lucide="bar-chart-2" width="18"></i> Projects ปัจจุบัน
+                    </h2>
+                    <div id="current-projects" class="text-sm text-slate-700 leading-relaxed"></div>
+                </div>
+
+                <!-- Export -->
+                <div class="p-6 bg-white/60 border border-emerald-200 rounded-2xl shadow-sm">
+                    <h2 class="font-bold text-emerald-900 mb-3 flex items-center gap-2">
+                        <i data-lucide="share" width="18"></i> Export Data
+                    </h2>
+                    <button onclick="exportData()"
+                        class="px-6 py-2.5 bg-emerald-500 text-white rounded-xl font-bold hover:bg-emerald-600 shadow-lg shadow-emerald-500/20 transition-all flex items-center gap-2 mb-3">
+                        <i data-lucide="copy" width="16"></i> Copy Project Data
+                    </button>
+                    <textarea id="export-data" class="lumi-input text-xs font-mono" rows="4" readonly></textarea>
+                </div>
+
+                <!-- Import -->
+                <div class="p-6 bg-white/60 border border-purple-200 rounded-2xl shadow-sm">
+                    <h2 class="font-bold text-purple-900 mb-3 flex items-center gap-2">
+                        <i data-lucide="download" width="18"></i> Import Data
+                    </h2>
+                    <textarea id="import-data" class="lumi-input text-xs font-mono mb-3" rows="4"
+                        placeholder="Paste project data here..."></textarea>
+                    <button onclick="importData()"
+                        class="px-6 py-2.5 bg-purple-500 text-white rounded-xl font-bold hover:bg-purple-600 shadow-lg shadow-purple-500/20 transition-all flex items-center gap-2">
+                        <i data-lucide="save" width="16"></i> Import Projects
+                    </button>
+                </div>
+
+                <!-- Quick Reset -->
+                <div class="p-6 bg-white/60 border border-rose-200 rounded-2xl shadow-sm">
+                    <h2 class="font-bold text-rose-900 mb-3 flex items-center gap-2">
+                        <i data-lucide="trash-2" width="18"></i> Reset to Default
+                    </h2>
+                    <button onclick="resetToDefault()"
+                        class="px-6 py-2.5 bg-rose-500 text-white rounded-xl font-bold hover:bg-rose-600 shadow-lg shadow-rose-500/20 transition-all flex items-center gap-2">
+                        <i data-lucide="refresh-cw" width="16"></i> Reset Projects
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function displayCurrent() {
+            const profile = JSON.parse(localStorage.getItem('raven_profile')) || {};
+            const projects = profile.projects || [];
+            const display = document.getElementById('current-projects');
+
+            if (projects.length === 0) {
+                display.innerHTML = 'ไม่มีข้อมูลผลงาน';
+            } else {
+                display.innerHTML = projects.map((p, i) =>
+                    `${i + 1}. <strong>${p.name}</strong> - ${p.desc}`
+                ).join('<br>');
+            }
+        }
+
+        function exportData() {
+            const profile = JSON.parse(localStorage.getItem('raven_profile')) || {};
+            const data = JSON.stringify(profile.projects || [], null, 2);
+            document.getElementById('export-data').value = data;
+
+            // Copy to clipboard
+            navigator.clipboard.writeText(data).then(() => {
+                alert('✅ คัดลอกข้อมูลแล้ว! นำไปวางในอีก browser/origin');
+            });
+        }
+
+        function importData() {
+            const data = document.getElementById('import-data').value.trim();
+            if (!data) {
+                alert('❌ กรุณาวางข้อมูลก่อน');
+                return;
+            }
+
+            try {
+                const projects = JSON.parse(data);
+                const profile = JSON.parse(localStorage.getItem('raven_profile')) || {};
+                profile.projects = projects;
+                localStorage.setItem('raven_profile', JSON.stringify(profile));
+
+                alert('✅ Import สำเร็จ! รีเฟรชหน้าเพื่อดูผล');
+                displayCurrent();
+            } catch (e) {
+                alert('❌ ข้อมูลไม่ถูกต้อง: ' + e.message);
+            }
+        }
+
+        function resetToDefault() {
+            if (!confirm('ยืนยันการ Reset?')) return;
+
+            const defaultProjects = [
+                { name: "Luminous UI", desc: "Design System", img: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&q=80&w=600", link: "#" },
+                { name: "Glass App", desc: "Mobile Interface", img: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=600", link: "#" },
+                { name: "Neon Web", desc: "Frontend", img: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&q=80&w=600", link: "#" }
+            ];
+
+            const profile = JSON.parse(localStorage.getItem('raven_profile')) || {};
+            profile.projects = defaultProjects;
+            localStorage.setItem('raven_profile', JSON.stringify(profile));
+
+            alert('✅ Reset เรียบร้อย!');
+            displayCurrent();
+        }
+
+        // Init
+        displayCurrent();
+        lucide.createIcons();
+    </script>
+</body>
+
+</html>
