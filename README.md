@@ -11,6 +11,13 @@
 
 ---
 
+### 🔐 Login Credentials (ข้อมูลเข้าสู่ระบบ)
+สำหรับการทดสอบระบบในส่วน Login First Architecture:
+* **Username:** `Raven`
+* **Password:** `12345678123`
+
+---
+
 ### 🚀 Key Features (ฟีเจอร์ที่ทำมาเพื่อใช้จริง)
 
 * 🔐 **Login First Architecture:** A secure gateway to my personal data.
