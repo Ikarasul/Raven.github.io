@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="RavenPort - ตารางเรียนและการบ้าน">
+    <meta name="theme-color" content="#10b981">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>Schedule - RavenPort</title>
+
+
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    <link rel="preconnect" href="https://unpkg.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="../js/auth-check.js"></script>
+    <script src="../js/chatbot.js" defer></script>
+    <script src="../js/nav.js"></script>
+
+
+    <link rel="stylesheet" href="../css/christmas-theme.css">
+    <script src="../js/christmas-effects.js" defer></script>
+
+
+    <style>
+        .timetable-container {
+            border-radius: 1rem;
+
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border: 1px solid white;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+        }
+
+        .timetable-header {
+            display: flex;
+            border-bottom: 1px solid #e2e8f0;
+            background: #FBBF24;
+
+            color: #1e293b;
+        }
+
+        .day-label {
+            width: 70px;
+
+            flex-shrink: 0;
+            background: #1E293B;
+
+            border-right: 1px solid #334155;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 0.7rem;
+
+            color: #f8fafc;
+
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .time-slot-head {
+            flex: 1;
+            text-align: center;
+            padding: 0.75rem 0;
+
+            border-right: 1px solid rgba(0, 0, 0, 0.05);
+
+            font-size: 0.7rem;
+            color: #1e293b;
+
+            font-weight: 700;
+        }
+
+        .timetable-body {
+            position: relative;
+        }
+
+        .day-row {
+            display: flex;
+            height: 4.5rem;
+
+            border-bottom: 1px solid #f8fafc;
+        }
+
+        .day-row:nth-child(even) .day-track {
+            background: rgba(248, 250, 252, 0.3);
+        }
+
+        .day-track {
+            flex: 1;
+            position: relative;
+            background-image: repeating-linear-gradient(to right, transparent, transparent calc(7.69% - 1px), #f8fafc calc(7.69% - 1px), #f8fafc 7.69%);
+        }
+
+
+        .subject-block {
+            position: absolute;
+            top: 0.35rem;
+
+            bottom: 0.35rem;
+            left: 1px;
+            right: 1px;
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+            color: white;
+            font-size: 0.7rem;
+            overflow: hidden;
+            cursor: pointer;
+
+            box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.05);
+            border-top: 1px solid rgba(255, 255, 255, 0.3);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            transition: all 0.2s ease;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            line-height: 1.2;
+        }
+
+        .subject-block:hover {
+            transform: translateY(-2px) scale(1.01);
+            box-shadow: 0 8px 12px -3px rgba(0, 0, 0, 0.1);
+            z-index: 20;
+        }
+
+        .subject-block .font-bold {
+            font-size: 0.8rem !important;
+
+            font-weight: 800;
+            margin-bottom: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .subject-block .text-\[9px\] {
+            font-size: 0.65rem !important;
+            opacity: 0.9;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .room-badge {
+            display: none;
+        }
+
+
+
+
+        .mobile-schedule-container {
+            display: none;
+        }
+
+
+
+        .m-time {
+            display: none;
+        }
+
+        @media (max-width: 900px) {
+
+
+
+            .timetable-container {
+                display: block;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+
+                background: white;
+                margin-left: -1rem;
+                margin-right: -1rem;
+                width: calc(100% + 2rem);
+                border-radius: 0;
+                padding: 0;
+            }
+
+
+            .timetable-header,
+            .timetable-body,
+            .day-row {
+                min-width: 900px;
+
+            }
+
+
+            .day-label {
+                position: sticky;
+                left: 0;
+                z-index: 30;
+                background: #1E293B;
+
+                border-right: 1px solid #334155;
+                box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            }
+
+
+            .timetable-header {
+                position: sticky;
+                top: 0;
+                z-index: 40;
+            }
+
+
+            .timetable-header .day-label {
+                z-index: 50;
+            }
+
+
+            .d-time {
+                display: inline;
+            }
+
+            .m-time {
+                display: none;
+            }
+
+            .day-label span {
+                display: inline;
+
+            }
+
+
+            .day-label::after {
+                display: none;
+            }
+
+
+            .subject-block {
+
+                position: absolute;
+
+
+                top: 1px;
+                bottom: 1px;
+
+                justify-content: center;
+            }
+
+            .subject-block div:first-child {
+                font-size: 0.75rem;
+
+                white-space: nowrap;
+            }
+
+
+            .day-row.empty-day {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+
+<body class="page-container relative">
+
+    <div class="aurora-bg animate-fade-in"></div>
+
+
+
+    <div id="class-modal" class="fixed inset-0 z-[100] hidden">
+
+        <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity" onclick="closeModal()"></div>
+
+
+        <div
+            class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-md bg-white rounded-3xl shadow-2xl p-0 overflow-hidden transform transition-all scale-100 opacity-100">
+
+
+            <div id="modal-header" class="bg-slate-100 p-6 pb-8 relative">
+                <button onclick="closeModal()"
+                    class="absolute top-4 right-4 text-white/80 hover:text-white bg-black/10 hover:bg-black/20 rounded-full p-1.5 transition-colors">
+                    <i data-lucide="x" width="20"></i>
+                </button>
+                <div class="px-3 py-1 rounded-lg bg-white/20 backdrop-blur text-white text-xs font-bold w-fit mb-3"
+                    id="modal-id">CODE</div>
+                <h2 class="text-2xl font-extrabold text-white leading-tight" id="modal-title">Course Name</h2>
+            </div>
+
+
+            <div class="p-6 -mt-4 bg-white rounded-t-3xl relative z-10">
+
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div class="bg-slate-50 p-3 rounded-2xl border border-slate-100">
+                        <div class="text-[10px] uppercase text-slate-400 font-bold mb-1">Time</div>
+                        <div class="text-sm font-bold text-slate-700 flex items-center gap-1.5">
+                            <i data-lucide="clock" width="14" class="text-slate-400"></i>
+                            <span id="modal-time">--:--</span>
+                        </div>
+                    </div>
+                    <div class="bg-slate-50 p-3 rounded-2xl border border-slate-100">
+                        <div class="text-[10px] uppercase text-slate-400 font-bold mb-1">Location</div>
+                        <div class="text-sm font-bold text-slate-700 flex items-center gap-1.5">
+                            <i data-lucide="map-pin" width="14" class="text-slate-400"></i>
+                            <span id="modal-room">--</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3 mb-6 p-3 bg-indigo-50/50 border border-indigo-100 rounded-2xl">
+                    <div
+                        class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold text-lg">
+                        👨‍🏫</div>
+                    <div>
+                        <div class="text-[10px] uppercase text-indigo-400 font-bold">Lecturer</div>
+                        <div class="text-sm font-bold text-indigo-900" id="modal-lecturer">--</div>
+                    </div>
+                </div>
+
+
+                <div class="border-t border-slate-100 pt-5">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="font-bold text-slate-700 flex items-center gap-2">
+                            <i data-lucide="sticky-note" width="18" class="text-yellow-500"></i>
+                            Quick Note
+                        </div>
+                        <button onclick="editNoteFromModal()"
+                            class="text-xs font-bold text-emerald-500 hover:text-emerald-600">Edit Note</button>
+                    </div>
+                    <div class="bg-yellow-50/50 p-4 rounded-xl border border-yellow-100 text-sm text-slate-600 min-h-[80px] whitespace-pre-wrap"
+                        id="modal-note">No notes recorded.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="mb-8 animate-enter flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+            <h1 class="text-3xl font-extrabold text-slate-800 mb-2" data-i18n="p2_title">Class Schedule 📅</h1>
+            <p class="text-slate-500 font-medium" data-i18n="p2_subtitle">Semester 2/2568 • Official Timetable</p>
+        </div>
+        <div
+            class="bg-white/80 backdrop-blur px-5 py-2.5 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-3">
+            <div class="text-xs font-bold text-slate-400 uppercase tracking-wider" data-i18n="p2_today">Today is</div>
+            <div class="text-lg font-bold text-emerald-500 flex items-center gap-2">
+                <i data-lucide="sun" width="20"></i> <span id="current-day">Loading...</span>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="timetable-container mb-12 animate-enter" style="animation-delay: 0.1s">
+
+        <div class="timetable-header">
+            <div class="day-label" style="background:transparent; box-shadow:none; border:none"></div>
+            <div class="time-slot-head"><span class="d-time">08:00</span><span class="m-time">8</span></div>
+            <div class="time-slot-head"><span class="d-time">09:00</span><span class="m-time">9</span></div>
+            <div class="time-slot-head"><span class="d-time">10:00</span><span class="m-time">10</span></div>
+            <div class="time-slot-head"><span class="d-time">11:00</span><span class="m-time">11</span></div>
+            <div class="time-slot-head"><span class="d-time">12:00</span><span class="m-time">12</span></div>
+            <div class="time-slot-head"><span class="d-time">13:00</span><span class="m-time">13</span></div>
+            <div class="time-slot-head"><span class="d-time">14:00</span><span class="m-time">14</span></div>
+            <div class="time-slot-head"><span class="d-time">15:00</span><span class="m-time">15</span></div>
+            <div class="time-slot-head"><span class="d-time">16:00</span><span class="m-time">16</span></div>
+            <div class="time-slot-head"><span class="d-time">17:00</span><span class="m-time">17</span></div>
+            <div class="time-slot-head"><span class="d-time">18:00</span><span class="m-time">18</span></div>
+            <div class="time-slot-head"><span class="d-time">19:00</span><span class="m-time">19</span></div>
+            <div class="time-slot-head"><span class="d-time">20:00</span><span class="m-time">20</span></div>
+        </div>
+
+        <div class="timetable-body" id="timetable-body">
+
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+
+        <div class="lg:col-span-2 grid md:grid-cols-2 gap-6 animate-enter" style="animation-delay: 0.2s">
+
+            <div class="card p-6 bg-white shadow-sm border border-slate-100 flex flex-col h-[500px]">
+                <h3 class="font-bold text-slate-800 mb-4 flex items-center gap-2 flex-shrink-0">
+                    <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center"><i
+                            data-lucide="check-square" width="18"></i></div>
+                    <span data-i18n="p2_assign_title">Assignments</span>
+                </h3>
+
+
+                <div id="assignment-list" class="flex-1 overflow-y-auto space-y-4 pr-2">
+
+                </div>
+            </div>
+
+            <div class="card p-6 bg-white shadow-sm border border-slate-100 flex flex-col">
+                <h3 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-lg bg-yellow-100 text-yellow-600 flex items-center justify-center"><i
+                            data-lucide="sticky-note" width="18"></i></div>
+                    <span data-i18n="p2_notes_title">Quick Notes</span>
+                </h3>
+
+
+                <select id="note-subject" onchange="loadNote()"
+                    class="mb-2 w-full bg-slate-50 border-0 rounded-xl px-3 py-2 text-sm font-medium text-slate-600 focus:ring-2 focus:ring-yellow-200 cursor-pointer">
+                    <option value="general">📝 General Notes</option>
+
+                </select>
+
+                <textarea id="note-in"
+                    class="flex-1 bg-yellow-50/50 border-0 rounded-xl p-4 text-sm resize-none focus:ring-2 focus:ring-yellow-200"
+                    placeholder="Type something..." data-i18n-ph="p2_notes_ph"></textarea>
+            </div>
+        </div>
+
+
+        <div class="card p-6 bg-gradient-to-br from-white to-fuchsia-50 animate-enter" style="animation-delay: 0.3s">
+            <h3 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
+                <div class="w-8 h-8 rounded-lg bg-pink-100 text-pink-600 flex items-center justify-center"><i
+                        data-lucide="calendar-clock" width="18"></i></div>
+                <span data-i18n="p2_exam_title">Exams (Apr 2026)</span>
+            </h3>
+
+            <div class="space-y-3">
+
+                <div onclick="openExamModal('IS Mgt Standards')"
+                    class="cursor-pointer group bg-white p-3 rounded-xl border border-blue-100 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all relative overflow-hidden">
+                    <div
+                        class="absolute top-0 right-0 bg-amber-100 text-amber-600 text-[9px] font-bold px-2 py-0.5 rounded-bl-lg flex items-center gap-1 opacity-100">
+                        <i data-lucide="clock" width="8"></i> <span data-i18n="p2_waiting">Wait for Update</span>
+                    </div>
+                    <div class="text-[10px] font-bold text-blue-500 uppercase mt-1">27 Apr • <span
+                            data-i18n="p2_exam_morning">Morning</span></div>
+                    <div class="font-bold text-slate-700 text-sm">IS Mgt Standards</div>
+                </div>
+
+
+                <div onclick="openExamModal('Cloud Computing')"
+                    class="cursor-pointer group bg-white p-3 rounded-xl border border-blue-100 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all relative overflow-hidden">
+                    <div
+                        class="absolute top-0 right-0 bg-amber-100 text-amber-600 text-[9px] font-bold px-2 py-0.5 rounded-bl-lg flex items-center gap-1 opacity-100">
+                        <i data-lucide="clock" width="8"></i> <span data-i18n="p2_waiting">Wait for Update</span>
+                    </div>
+                    <div class="text-[10px] font-bold text-blue-500 uppercase mt-1">27 Apr • <span
+                            data-i18n="p2_exam_afternoon">Afternoon</span></div>
+                    <div class="font-bold text-slate-700 text-sm">Cloud Computing</div>
+                </div>
+
+
+                <div onclick="openExamModal('IT Audit')"
+                    class="cursor-pointer group bg-white p-3 rounded-xl border border-blue-100 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all relative overflow-hidden">
+                    <div
+                        class="absolute top-0 right-0 bg-amber-100 text-amber-600 text-[9px] font-bold px-2 py-0.5 rounded-bl-lg flex items-center gap-1 opacity-100">
+                        <i data-lucide="clock" width="8"></i> <span data-i18n="p2_waiting">Wait for Update</span>
+                    </div>
+                    <div class="text-[10px] font-bold text-pink-500 uppercase mt-1">28 Apr • <span
+                            data-i18n="p2_exam_morning">Morning</span></div>
+                    <div class="font-bold text-slate-700 text-sm">IT Audit</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <script>
+        lucide.createIcons();
+        lucide.createIcons();
+
+        const updateCurrentDay = () => {
+            const lang = localStorage.getItem('raven_lang') === 'th' ? 'th-TH' : 'en-US';
+            document.getElementById('current-day').innerText = new Date().toLocaleDateString(lang, { weekday: 'long' });
+        };
+
+
+        updateCurrentDay();
+        window.addEventListener('languageChanged', updateCurrentDay);
+
+
+
+
+
+        const START_HOUR = 8;
+        const TOTAL_HOURS = 13;
+
+        const scheduleData = [
+            {
+                day: 'Monday', label: 'Mon', key: 'day_mon',
+                classes: [
+                    { name: 'ICT12367 (2:004)', desc: '13:00-14:40', start: 13, duration: 1.666, color: 'bg-emerald-400' }
+                ]
+            },
+            {
+                day: 'Tuesday', label: 'Tue', key: 'day_tue',
+                classes: [
+                    { name: 'ICT25367 (1:001)', desc: '09:00-11:30', start: 9, duration: 2.5, color: 'bg-yellow-300' }
+                ]
+            },
+            {
+                day: 'Wednesday', label: 'Wed', key: 'day_wed',
+                classes: [
+                    { name: 'ICT25267 (1:002)', desc: '09:00-11:30', start: 9, duration: 2.5, color: 'bg-yellow-300' },
+                    { name: 'ICT12367 (1:003)', desc: '13:00-14:40', start: 13, duration: 1.666, color: 'bg-yellow-300' }
+                ]
+            },
+            {
+                day: 'Thursday', label: 'Thu', key: 'day_thu',
+                classes: [
+                    { name: 'ICT22667 (2:001)', desc: '09:00-10:40', start: 9, duration: 1.666, color: 'bg-emerald-400' },
+                    { name: 'ICT22667 (1:001)', desc: '11:00-12:40', start: 11, duration: 1.666, color: 'bg-yellow-300' },
+                    { name: 'ICT24267 (2:001)', desc: '13:00-14:40', start: 13, duration: 1.666, color: 'bg-emerald-400' },
+                    { name: 'ICT24267 (1:001)', desc: '15:00-16:40', start: 15, duration: 1.666, color: 'bg-yellow-300' }
+                ]
+            },
+            { day: 'Friday', label: 'Fri', key: 'day_fri', classes: [] },
+            { day: 'Saturday', label: 'Sat', key: 'day_sat', classes: [] },
+            { day: 'Sunday', label: 'Sun', key: 'day_sun', classes: [] }
+        ];
+
+        const container = document.getElementById('timetable-body');
+
+
+        function renderSchedule() {
+            const lang = localStorage.getItem('raven_lang') || 'th';
+
+
+
+            const shortLabels = {
+                'en': { 'day_mon': 'M', 'day_tue': 'T', 'day_wed': 'W', 'day_thu': 'T', 'day_fri': 'F', 'day_sat': 'S', 'day_sun': 'S' },
+                'th': { 'day_mon': 'จ', 'day_tue': 'อ', 'day_wed': 'พ', 'day_thu': 'พฤ', 'day_fri': 'ศ', 'day_sat': 'ส', 'day_sun': 'อา' }
+            };
+            const mappedLang = lang === 'th' ? 'th' : 'en';
+            const todayEng = new Date().toLocaleDateString('en-US', { weekday: 'long' });
+
+            scheduleData.forEach(day => {
+                let blocksHTML = '';
+                day.classes.forEach(cls => {
+                    const left = ((cls.start - START_HOUR) / TOTAL_HOURS) * 100;
+                    const width = (cls.duration / TOTAL_HOURS) * 100;
+                    blocksHTML += `
+                        <div onclick="openClassModal('${cls.name}')" class="subject-block ${cls.color}" style="left: ${left}%; width: ${width}%;">
+                            <div class="font-bold leading-tight" style="font-size:0.75rem; pointer-events-none">${cls.name.split(' ')[0]}</div>
+                        </div>
+                    `;
+                });
+
+                const isToday = day.day === todayEng;
+                const shortLabel = (day.key && shortLabels[mappedLang][day.key]) ? shortLabels[mappedLang][day.key] : day.label.charAt(0);
+                const isEmpty = day.classes.length === 0;
+
+                container.innerHTML += `
+                    <div class="day-row ${isToday ? 'bg-slate-50' : ''} ${isEmpty ? 'empty-day' : ''}">
+                        <div class="day-label" data-short="${shortLabel}">
+
+                            <span class="text-sm uppercase tracking-wider text-slate-400" data-i18n="${day.key}">${day.label}</span>
+                            ${isToday ? '<span class="text-[10px] text-emerald-500 font-bold ml-1">●</span>' : ''}
+                        </div>
+                        <div class="day-track">${blocksHTML}</div>
+                    </div>
+                `;
+            });
+            lucide.createIcons();
+
+        }
+
+
+        renderSchedule();
+
+
+
+        window.addEventListener('languageChanged', () => {
+            renderSchedule();
+        });
+
+
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'raven_lang') renderSchedule();
+        });
+
+
+        function renderAssignments() {
+            const container = document.getElementById('assignment-list');
+            const assignments = JSON.parse(localStorage.getItem('raven_assignments') || '[]');
+
+            container.innerHTML = '';
+
+
+            window.COURSES.forEach(course => {
+                const courseAssigns = assignments.filter(a => a.courseId === course.id);
+
+
+                const colorMap = {
+                    'emerald': 'bg-emerald-100 text-emerald-700',
+                    'orange': 'bg-orange-100 text-orange-700',
+                    'blue': 'bg-blue-100 text-blue-700',
+                    'purple': 'bg-purple-100 text-purple-700',
+                    'pink': 'bg-pink-100 text-pink-700'
+                };
+                const badgeClass = colorMap[course.color] || 'bg-slate-100 text-slate-700';
+
+
+                const card = document.createElement('div');
+                card.className = 'bg-slate-50 rounded-2xl p-4 border border-slate-100';
+
+                let listHtml = '';
+                if (courseAssigns.length === 0) {
+                    listHtml = `<div class="text-slate-400 text-xs text-center py-2 italic">No active assignments</div>`;
+                } else {
+                    listHtml = courseAssigns.map(a => `
+                        <div class="flex items-center gap-3 p-2 bg-white rounded-xl border border-slate-100 shadow-sm mb-2 last:mb-0">
+                            <button onclick="toggleAssign('${a.id}')" class="flex-shrink-0 text-slate-300 hover:text-emerald-500 transition-colors">
+                                <i data-lucide="${a.done ? 'check-circle-2' : 'circle'}" class="${a.done ? 'text-emerald-500 fill-emerald-100' : ''}" width="20"></i>
+                            </button>
+                            <div class="flex-1 min-w-0">
+                                <div class="text-sm font-medium ${a.done ? 'line-through text-slate-400' : 'text-slate-700'} truncate">${a.title}</div>
+                                ${a.file ? `<div class="text-[10px] text-emerald-500 flex items-center gap-1"><i data-lucide="file-check" width="10"></i> Submitted</div>` : ''}
+                            </div>
+                            <button onclick="deleteAssign('${a.id}')" class="text-slate-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <i data-lucide="trash-2" width="14"></i>
+                            </button>
+                        </div>
+                    `).join('');
+                }
+
+                card.innerHTML = `
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center gap-2">
+                            <div class="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider ${badgeClass}">
+                                ${course.id}
+                            </div>
+                            <h4 class="font-bold text-slate-700 text-sm truncate max-w-[150px]" title="${course.name}">${course.name}</h4>
+                            <span class="text-xs text-slate-400">• ${courseAssigns.length} items</span>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-2 mb-3">
+                        ${listHtml}
+                    </div>
+
+                    <button onclick="addSpecificAssign('${course.id}')" class="w-full py-2 flex items-center justify-center gap-2 text-xs font-bold text-slate-500 border border-dashed border-slate-300 rounded-xl hover:bg-white hover:text-emerald-600 hover:border-emerald-300 transition-all">
+                        <i data-lucide="plus" width="14"></i> Create Task
+                    </button>
+                `;
+
+                container.appendChild(card);
+            });
+            lucide.createIcons();
+        }
+
+
+        window.toggleAssign = (id) => {
+            const assignments = JSON.parse(localStorage.getItem('raven_assignments') || '[]');
+            const idx = assignments.findIndex(a => a.id === id);
+            if (idx > -1) {
+                assignments[idx].done = !assignments[idx].done;
+                localStorage.setItem('raven_assignments', JSON.stringify(assignments));
+                renderAssignments();
+            }
+        };
+
+        window.deleteAssign = (id) => {
+            if (confirm('Delete this task?')) {
+                const assignments = JSON.parse(localStorage.getItem('raven_assignments') || '[]');
+                const idx = assignments.findIndex(a => a.id === id);
+                if (idx > -1) {
+                    assignments.splice(idx, 1);
+                    localStorage.setItem('raven_assignments', JSON.stringify(assignments));
+                    renderAssignments();
+                }
+            }
+        };
+
+        window.openExamModal = (subject) => {
+
+            const lang = localStorage.getItem('raven_lang') || 'th';
+            const msg = lang === 'th' ?
+                `อาจมีการเปลี่ยนแปลง เนื่องจากอ้างอิงจากตารางลงทะเบียนเรียนครับ 🚧` :
+                `Subject to change as this is based on the registration schedule. 🚧`;
+            alert(msg);
+        };
+
+        window.addSpecificAssign = (courseId) => {
+            const title = prompt("Enter assignment title:");
+            if (title) {
+                const assignments = JSON.parse(localStorage.getItem('raven_assignments') || '[]');
+                assignments.push({
+                    id: 'asn_' + Date.now(),
+                    courseId: courseId,
+                    title: title,
+                    done: false,
+                    file: null,
+                    submittedDate: null
+                });
+                localStorage.setItem('raven_assignments', JSON.stringify(assignments));
+                renderAssignments();
+            }
+        };
+
+
+        renderAssignments();
+
+
+        const noteSub = document.getElementById('note-subject');
+        const noteIn = document.getElementById('note-in');
+
+
+        if (window.COURSES && noteSub) {
+            window.COURSES.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c.id;
+                opt.innerText = `📚 ${c.name}`;
+                noteSub.appendChild(opt);
+            });
+        }
+
+
+        const getNotes = () => JSON.parse(localStorage.getItem('raven_notes_v2') || '{}');
+
+        window.loadNote = () => {
+            const notes = getNotes();
+            const key = noteSub.value;
+
+
+            if (key === 'general' && !notes['general']) {
+                noteIn.value = localStorage.getItem('raven_notes') || '';
+            } else {
+                noteIn.value = notes[key] || '';
+            }
+        };
+
+        if (noteIn) {
+            noteIn.addEventListener('input', () => {
+                const notes = getNotes();
+                notes[noteSub.value] = noteIn.value;
+                localStorage.setItem('raven_notes_v2', JSON.stringify(notes));
+
+
+                if (noteSub.value === 'general') {
+                    localStorage.setItem('raven_notes', noteIn.value);
+                }
+            });
+        }
+
+
+
+
+        window.openClassModal = (rawName) => {
+
+
+            const course = window.COURSES.find(c => c.id === courseId);
+
+            if (course) {
+
+                document.getElementById('modal-id').innerText = course.id;
+                document.getElementById('modal-title').innerText = course.name;
+
+
+                const colorMap = {
+                    'emerald': 'bg-emerald-500', 'orange': 'bg-orange-500',
+                    'blue': 'bg-blue-500', 'purple': 'bg-purple-500', 'pink': 'bg-pink-500'
+                };
+                const bgClass = colorMap[course.color] || 'bg-slate-500';
+
+
+                const header = document.getElementById('modal-header');
+                header.className = `p-6 pb-8 relative ${bgClass}`;
+
+
+                document.getElementById('modal-lecturer').innerText = course.lecturer || 'TBA';
+                document.getElementById('modal-room').innerText = course.location || 'TBA';
+
+
+                let timeStr = '--:--';
+                scheduleData.forEach(d => {
+                    d.classes.forEach(cls => {
+                        if (cls.name === rawName) timeStr = cls.desc;
+                    });
+                });
+                document.getElementById('modal-time').innerText = timeStr;
+
+
+                const notes = getNotes();
+                const noteText = notes[course.id] || "No notes recorded.";
+                document.getElementById('modal-note').innerText = noteText;
+
+
+                document.getElementById('class-modal').classList.remove('hidden');
+            }
+        };
+
+        window.closeModal = () => {
+            document.getElementById('class-modal').classList.add('hidden');
+        };
+
+        window.editNoteFromModal = () => {
+            closeModal();
+            const courseId = document.getElementById('modal-id').innerText;
+            noteSub.value = courseId;
+            loadNote();
+
+
+            setTimeout(() => {
+                noteIn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                noteIn.classList.add('ring-4', 'ring-yellow-300');
+                setTimeout(() => noteIn.classList.remove('ring-4', 'ring-yellow-300'), 400);
+            }, 100);
+        };
+
+
+        loadNote();
+
+        /* --- Mobile Render Logic (Modern Timeline) --- */
+        function renderMobileSchedule() {
+            const mobileContainer = document.getElementById('mobile-schedule');
+            const lang = localStorage.getItem('raven_lang') || 'th';
+
+            let mobileHTML = '';
+            const todayEng = new Date().toLocaleDateString('en-US', { weekday: 'long' });
+
+            scheduleData.forEach(day => {
+                // Skip days with no classes
+                if (day.classes.length === 0) return;
+
+                const isToday = day.day === todayEng;
+                const dayLabel = (window.TRANSLATIONS && window.TRANSLATIONS[lang][day.key]) ? window.TRANSLATIONS[lang][day.key] : day.label;
+
+                let timelineItemsHTML = '';
+                day.classes.forEach(cls => {
+                    const courseId = cls.name.split(' ')[0];
+                    const course = window.COURSES.find(c => c.id === courseId);
+                    const room = course ? course.location : 'TBA';
+                    const lecturer = course ? course.lecturer : 'TBA';
+
+                    // Style Map
+                    const colorMap = {
+                        'emerald': '#10b981', 'yellow': '#f59e0b', 'orange': '#f97316', 'blue': '#3b82f6', 'purple': '#8b5cf6', 'pink': '#ec4899'
+                    };
+                    // Determine main color from cls.color (approximate)
+                    let mainColor = '#64748b';
+                    if (cls.color.includes('emerald')) mainColor = colorMap['emerald'];
+                    else if (cls.color.includes('yellow')) mainColor = colorMap['yellow'];
+                    else if (cls.color.includes('orange')) mainColor = colorMap['orange'];
+                    else if (cls.color.includes('blue')) mainColor = colorMap['blue'];
+                    else if (cls.color.includes('purple')) mainColor = colorMap['purple'];
+                    else if (cls.color.includes('pink')) mainColor = colorMap['pink'];
+
+                    timelineItemsHTML += `
+                        <div class="timeline-item">
+                            <div class="timeline-dot" style="border-color: ${mainColor}"></div>
+                            
+                            <div class="timeline-time">
+                                <span style="color:${mainColor}">${cls.desc}</span>
+                            </div>
+
+                            <div class="timeline-card" onclick="selectSubjectNote('${cls.name}')" style="box-shadow: 0 4px 15px ${mainColor}15, 0 1px 2px rgba(0,0,0,0.05);">
+                                <div class="card-accent" style="background: ${mainColor}"></div>
+                                <div class="card-title">${cls.name}</div>
+                                <div class="card-details">
+                                    <div class="detail-badge">
+                                        <i data-lucide="map-pin" width="12"></i> ${room}
+                                    </div>
+                                    <div class="detail-badge">
+                                        <i data-lucide="user" width="12"></i> ${lecturer}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                mobileHTML += `
+                    <div class="mobile-day-group ${isToday ? 'today' : ''}">
+                        <div class="mobile-day-header">
+                            <div class="mobile-day-title">${dayLabel}</div>
+                            <span class="mobile-day-badge">${day.classes.length} Class${day.classes.length > 1 ? 'es' : ''}</span>
+                        </div>
+                        <div class="timeline-track">
+                            ${timelineItemsHTML}
+                        </div>
+                    </div>
+                `;
+            });
+
+            if (mobileHTML === '') {
+                mobileHTML = `
+                    <div class="text-center py-12 text-slate-400">
+                        <i data-lucide="coffee" width="48" class="mx-auto mb-4 opacity-50"></i>
+                        <p>No classes this week! Time to relax. ☁️</p>
+                    </div>
+                `;
+            }
+
+            mobileContainer.innerHTML = mobileHTML;
+            lucide.createIcons();
+        }
+
+        renderMobileSchedule();
+        window.addEventListener('languageChanged', renderMobileSchedule);
+    </script>
+    <script src="guest.js"></script>
+    <script>
+        (function () {
+            if (localStorage.getItem('isGuest') === 'true') {
+                const style = document.createElement('style');
+                style.innerHTML = `
+                    .guest-hidden,
+                    button[onclick^="addSpecificAssign"],
+                    button[onclick^="deleteAssign"],
+                    button[onclick^="toggleAssign"],
+                    button[onclick^="editNoteFromModal"] {
+                        display: none !important;
+                    }
+                    /* Hide note editing hint/ring */
+                    #note-in { pointer-events: none; opacity: 0.7; background-color: #f8fafc; }
+                `;
+                document.head.appendChild(style);
+
+                // 2. Disable Inputs
+                const noteIn = document.getElementById('note-in');
+                if (noteIn) {
+                    noteIn.readOnly = true;
+                    noteIn.placeholder = "Read-only mode (Guest)";
+                }
+            }
+        })();
+    </script>
+
+</body>
+
+</html>
