@@ -516,7 +516,10 @@ window.COURSES = [
         if (!document.getElementById('nav-styles')) { style.id = 'nav-styles'; document.head.appendChild(style); }
 
 
-        const getLang = () => localStorage.getItem('raven_lang') || 'th';
+        const getLang = () => {
+            const l = localStorage.getItem('raven_lang');
+            return (l === 'en' || l === 'th') ? l : 'th';
+        };
         let currentLang = getLang();
 
 
@@ -759,7 +762,7 @@ window.COURSES = [
         };
 
 
-        initNav();
+        // initNav(); // Removed to prevent recursion
         renderNav();
 
     };

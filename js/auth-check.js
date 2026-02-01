@@ -26,7 +26,10 @@
     const guestAllowedPages = [
         'p1.html',
         'p2.html',
-        'p5.html'
+        'p3.html',
+        'p5.html',
+        'p6.html',
+        'submit.html'
     ];
 
 

@@ -68,7 +68,7 @@ function guestLogin() {
     localStorage.setItem('isGuest', 'true');
     localStorage.removeItem('isLoggedIn');
     localStorage.removeItem('raven_user');
-    window.location.href = 'p5.html';
+    window.location.href = 'pages/p5.html';
 }
 
 function togglePass(event) {
