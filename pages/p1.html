@@ -27,7 +27,7 @@
 
     <script src="../js/auth-check.js"></script>
     <script src="../js/theme.js"></script>
-    <script src="../js/nav.js"></script>
+    <script src="../js/nav.js" defer></script>
     <script src="../js/finance.js"></script>
     <script src="../js/weather.js" defer></script>
 
@@ -330,7 +330,7 @@
             <div class="flex justify-center gap-4 mt-6">
                 <button
                     class="px-6 py-2.5 bg-slate-800 text-white rounded-full font-bold shadow-lg shadow-slate-800/20 hover:bg-slate-700 transition-all flex items-center gap-2"
-                    onclick="window.location.href='pages/p5.html'">
+                    onclick="window.location.href='p5.html'">
                     <i data-lucide="user" width="16"></i> <span data-i18n="p1_about_me">About Me</span>
                 </button>
             </div>
@@ -360,7 +360,7 @@
             <div class="control-grid">
 
 
-                <a href="pages/P2.html" class="lumi-card action-btn group">
+                <a href="P2.html" class="lumi-card action-btn group">
                     <div class="btn-icon bg-gradient-to-br from-blue-400 to-blue-600">
                         <i data-lucide="calendar"></i>
                     </div>
@@ -372,7 +372,7 @@
                 </a>
 
 
-                <a href="pages/p3.html" class="lumi-card action-btn group">
+                <a href="p3.html" class="lumi-card action-btn group">
                     <div class="btn-icon bg-gradient-to-br from-emerald-400 to-emerald-600">
                         <i data-lucide="wallet"></i>
                     </div>
@@ -386,7 +386,7 @@
 
 
 
-                <a href="pages/p6.html" class="lumi-card action-btn group">
+                <a href="p6.html" class="lumi-card action-btn group">
                     <div class="btn-icon bg-gradient-to-br from-rose-400 to-rose-600">
                         <i data-lucide="zap"></i>
                     </div>
@@ -473,17 +473,8 @@
 
 
 
-                const controlGrid = document.querySelector('.control-grid');
-                if (controlGrid) {
-                    controlGrid.style.display = 'none';
-
-                    if (controlGrid.previousElementSibling && controlGrid.previousElementSibling.classList.contains('section-title')) {
-                        controlGrid.previousElementSibling.style.display = 'none';
-                    }
-                    if (controlGrid.parentElement && controlGrid.parentElement.classList.contains('mb-12')) {
-                        controlGrid.parentElement.style.display = 'none';
-                    }
-                }
+                // Dashboard is now allowed for guests
+                // controlGrid hiding removed
 
 
 
